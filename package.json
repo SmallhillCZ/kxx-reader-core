@@ -1,0 +1,24 @@
+{
+  "name": "kxx-reader-core",
+  "version": "1.1.0",
+  "description": "Core methods for reading Gordic (Ginis) KXX format",
+  "main": "lib/index.js",
+  "keywords": [
+    "gordic",
+    "ginis",
+    "kxx"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SmallhillCZ/kxx-reader-core.git"
+  },
+  "author": "Martin Kopeček <martin.kopecek@smallhill.cz>",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/SmallhillCZ/kxx-reader-core/issues"
+  },
+  "homepage": "https://github.com/SmallhillCZ/kxx-reader-core#readme"
+}
