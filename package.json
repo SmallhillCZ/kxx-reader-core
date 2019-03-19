@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/SmallhillCZ/kxx-reader-core/issues"
   },
-  "homepage": "https://github.com/SmallhillCZ/kxx-reader-core#readme"
+  "homepage": "https://github.com/SmallhillCZ/kxx-reader-core#readme",
+  "devDependencies": {
+    "typescript": "^3.3.3333"
+  }
 }
