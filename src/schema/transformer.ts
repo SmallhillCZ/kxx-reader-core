@@ -1,9 +1,9 @@
-export type KxxTransformerPush<T> = (chunk: T) => void;
+export type KxxTransformerPushCallback<T> = (chunk: T) => void;
 
-export type KxxTransformerWarning = (warning: string) => void;
+export type KxxTransformerWarningCallback = (warning: string) => void;
 
 export interface KxxTransformer<I,O> {
-  start: (push: KxxTransformerPush<O>, warning: KxxTransformerWarning) => Promise<void>;
+  start: (push: KxxTransformerPushCallback<O>, warning: KxxTransformerWarningCallback) => Promise<void>;
   transform: (chunk: I) => Promise<void>;
   flush: () => Promise<void>;  
 }

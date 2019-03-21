@@ -1,4 +1,4 @@
-import { KxxRecord, KxxTransformer, KxxTransformerPush, KxxTransformerWarning } from "./schema";
+import { KxxRecord, KxxTransformer, KxxTransformerPushCallback, KxxTransformerWarningCallback } from "./schema";
 
 class RecordParserState {
   org: string;
@@ -10,19 +10,23 @@ class RecordParserState {
 
 type RegExpWithGroups = RegExpExecArray & { groups?: { [key: string]: string } };
 
-export class RecordParser implements KxxTransformer<string[],KxxRecord> {
+export class RecordParser implements KxxTransformer<string[], KxxRecord> {
 
   r_org = /^5\/@(?<id>\d{8})00/;
   r_period = /^6\/@(?<id>\d{8})(?<month>\d{2})(?<type>\d{2}) (?<input>\d) (?<year>\d{4})/;
-  r_record = /^G\/@(?<day>\d{2})(?<docid>[ 0-9]{9})000(?<su>\d{3})(?<au>\d{4})(?<kap>\d{2})\d\d(?<paragraph>\d{4})(?<item>\d{4})(?<zj>\d{3})(?<uz>\d{9})(?<orj>\d{10})(?<org>\d{13})(?<debit>\d{16})(?<debit_decimal>\d{2})(?<debit_sign>[\-C ])(?<credit>\d{16})(?<credit_decimal>\d{2})(?<credit_sign>[\-C ])/;
+  r_record = /^G\/@(?<day>\d{2})(?<docid>[ 0-9]{9})000(?<su>\d{3})(?<au>\d{4})(?<kap>\d{2})\d\d(?<odpa>\d{4})(?<pol>\d{4})(?<zj>\d{3})(?<uz>\d{9})(?<orj>\d{10})(?<org>\d{13})(?<md>\d{16})(?<md_decimal>\d{2})(?<md_sign>[\-C ])(?<d>\d{16})(?<d_decimal>\d{2})(?<d_sign>[\-C ])/;
+  r_comment = /^G\/\$(?<comment_id>\d{4})(?<docid>[ 0-9]{9})(?<comment>.*)$/;
+  r_meta_line = /^G\/#(?<comment_id>\d{4})(?<docid>[ 0-9]{9})(?<text>.*)$/;
+  r_meta_item = /\*(?<key>[A-Z]+)\-(?<value>[^;]*)(;|$)/g;
+  r_meta_item_sub = /(?<key>[A-Z]+)\-(?<value>.*)/;
 
   state: RecordParserState = new RecordParserState();
 
-  push: KxxTransformerPush<KxxRecord>;
+  push: KxxTransformerPushCallback<KxxRecord>;
 
-  warning: KxxTransformerWarning;
+  warning: KxxTransformerWarningCallback;
 
-  async start(push: KxxTransformerPush<KxxRecord>, warning: KxxTransformerWarning) {
+  async start(push: KxxTransformerPushCallback<KxxRecord>, warning: KxxTransformerWarningCallback) {
     this.push = push;
     this.warning = warning;
   }
@@ -59,21 +63,73 @@ export class RecordParser implements KxxTransformer<string[],KxxRecord> {
   }
 
   parseAccountingRecord(lines: string[]) {
-    const matches: RegExpWithGroups = this.r_record.exec(lines[0]);
-    const r = matches ? matches.groups : {};
 
-    const record: KxxRecord = {
-      ...this.state,
-      day: Number(r.day),
-      paragraph: r.paragraph,
-      item: r.item,
-      event: r.org,
-      credit: Number(r.credit_sign + r.credit + "." + r.credit_decimal),
-      debit: Number(r.debit_sign + r.debit + "." + r.debit_decimal),
-      data: lines
-    };
+    const record = new KxxRecord();
+    record.type = this.state.type;
+    record.input = this.state.input;
+    record.organization = this.state.org;
 
-    this.push(record)
+    var matches: RegExpWithGroups;
+
+    for (let line of lines) {
+      switch (line.charAt(2)) {
+
+        case "@":
+          matches = this.r_record.exec(line);
+          const r: any = matches ? matches.groups : {};
+          record.id = Number(r.docid);
+          record.date = new Date(this.state.year, this.state.month - 1, r.day);
+          record.balances.push({
+            su: Number(r.su),
+            au: Number(r.au),
+            kap: Number(r.kap),
+            odpa: Number(r.odpa),
+            pol: Number(r.pol),
+            zj: Number(r.zj),
+            uz: Number(r.uz),
+            orj: Number(r.orj),
+            org: Number(r.org),
+            md: Number(r.md_sign + r.md + "." + r.md_decimal),
+            d: Number(r.d_sign + r.d + "." + r.d_decimal)
+          });
+          break;
+
+        case "$":
+          matches = this.r_comment.exec(line);
+          const c: any = matches ? matches.groups : {};
+          record.comments.push(c.comment);
+          break;
+
+        case "#":
+          matches = this.r_meta_line.exec(line);
+          const text: string = matches ? matches.groups.text : null;
+          
+          if (text) {
+            
+            if (!text.match(this.r_meta_item)) record.meta_comments.push(text);
+            
+            else {
+              let match: RegExpWithGroups;
+              while (match = this.r_meta_item.exec(text)) {
+                let m = match ? match.groups : {};
+                if(m.key === "EVK") {
+                  if(!record.meta[m.key]) record.meta[m.key] = {};
+                  let m2:RegExpWithGroups = this.r_meta_item_sub.exec(m.value)
+                  if(m2) record.meta["EVK"][m2.groups.key] = m2.groups.value;
+                }
+                else record.meta[m.key] = m.value;
+              }
+            }
+
+          }
+          break;
+
+        default:
+          this.warning("Unknown record type: " + line);
+      }
+    }
+
+    this.push(record);
   }
 
 }

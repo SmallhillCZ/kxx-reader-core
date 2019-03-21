@@ -1,25 +1,27 @@
-import { KxxTransformer, KxxTransformerPush } from "./schema/transformer";
+import { KxxTransformer, KxxTransformerPushCallback } from "./schema/transformer";
 
 export class RecordMerger implements KxxTransformer<string, string[]> {
 
+  id: string;
+  type: string;
   lines: string[] = [];
 
-  push: KxxTransformerPush<string[]>;
+  push: KxxTransformerPushCallback<string[]>;
 
-  async start(push: KxxTransformerPush<string[]>) {
+  async start(push: KxxTransformerPushCallback<string[]>) {
     this.push = push;
   }
 
   async transform(line: any) {
 
-    switch (line.substr(2, 1)) {
-      case "@":
-        if (this.lines.length) this.push(this.lines);
-        this.lines = [line];
-        break;
+    const type = line.substr(2, 1);
+    const id = type === "@" ? line.substr(5, 9) : line.substr(7, 9);
 
-      default:
-        this.lines.push(line);
+    if (id === this.id && !(this.type === "@" && type !== "@")) this.lines.push(line);
+    else {
+      if (this.lines.length) this.push(this.lines);
+      this.id = id;
+      this.lines = [line];
     }
 
   }

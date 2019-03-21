@@ -1,18 +1,31 @@
+
+export interface KxxRecordBalance {
+  su: number,
+  au: number,
+  kap: number,
+  odpa: number,
+  pol: number,
+  zj: number,
+  uz: number,
+  orj: number,
+  org: number,
+
+  d: number;
+  md: number;
+}
+
 export class KxxRecord {
-  org: string;
+  organization: string;
   type: number;
   input: number;
-  
-  year: number;
-  month: number;
-  day: number;
+  id: number;
 
-  paragraph: string;
-  item: string;
-  event: string;
+  date: Date;
 
-  credit: number;
-  debit: number;
-  
-  data?: any;
+  balances: KxxRecordBalance[] = [];
+
+  comments: string[] = [];
+  meta_comments: string[] = [];
+  meta: any = {};
+
 }
