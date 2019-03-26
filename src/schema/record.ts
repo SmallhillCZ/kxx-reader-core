@@ -12,6 +12,8 @@ export interface KxxRecordBalance {
 
   d: number;
   md: number;
+
+  comments:string[];
 }
 
 export class KxxRecord {
@@ -25,7 +27,6 @@ export class KxxRecord {
   balances: KxxRecordBalance[] = [];
 
   comments: string[] = [];
-  meta_comments: string[] = [];
   meta: any = {};
 
 }

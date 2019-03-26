@@ -90,32 +90,33 @@ export class RecordParser implements KxxTransformer<string[], KxxRecord> {
             orj: Number(r.orj),
             org: Number(r.org),
             md: Number(r.md_sign + r.md + "." + r.md_decimal),
-            d: Number(r.d_sign + r.d + "." + r.d_decimal)
+            d: Number(r.d_sign + r.d + "." + r.d_decimal),
+            comments: []
           });
           break;
 
         case "$":
           matches = this.r_comment.exec(line);
           const c: any = matches ? matches.groups : {};
-          record.comments.push(c.comment);
+          record.balances[record.balances.length - 1].comments.push(c.comment);
           break;
 
         case "#":
           matches = this.r_meta_line.exec(line);
           const text: string = matches ? matches.groups.text : null;
-          
+
           if (text) {
-            
-            if (!text.match(this.r_meta_item)) record.meta_comments.push(text);
-            
+
+            if (!text.match(this.r_meta_item)) record.comments.push(text);
+
             else {
               let match: RegExpWithGroups;
               while (match = this.r_meta_item.exec(text)) {
                 let m = match ? match.groups : {};
-                if(m.key === "EVK") {
-                  if(!record.meta[m.key]) record.meta[m.key] = {};
-                  let m2:RegExpWithGroups = this.r_meta_item_sub.exec(m.value)
-                  if(m2) record.meta["EVK"][m2.groups.key] = m2.groups.value;
+                if (m.key === "EVK") {
+                  if (!record.meta[m.key]) record.meta[m.key] = {};
+                  let m2: RegExpWithGroups = this.r_meta_item_sub.exec(m.value)
+                  if (m2) record.meta["EVK"][m2.groups.key] = m2.groups.value;
                 }
                 else record.meta[m.key] = m.value;
               }

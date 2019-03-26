@@ -2,8 +2,7 @@ import { KxxTransformer, KxxTransformerPushCallback } from "./schema/transformer
 
 export class RecordMerger implements KxxTransformer<string, string[]> {
 
-  id: string;
-  type: string;
+  id: string;  
   lines: string[] = [];
 
   push: KxxTransformerPushCallback<string[]>;
@@ -17,7 +16,7 @@ export class RecordMerger implements KxxTransformer<string, string[]> {
     const type = line.substr(2, 1);
     const id = type === "@" ? line.substr(5, 9) : line.substr(7, 9);
 
-    if (id === this.id && !(this.type === "@" && type !== "@")) this.lines.push(line);
+    if (id === this.id) this.lines.push(line);
     else {
       if (this.lines.length) this.push(this.lines);
       this.id = id;
