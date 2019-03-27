@@ -145,8 +145,9 @@ export class RecordParser implements KxxTransformer<string[], KxxRecord> {
                 let m = match ? nameGroups(match, this.r_meta_item_names) : {};
                 if (m.key === "EVK") {
                   if (!record.meta[m.key]) record.meta[m.key] = {};
-                  let m2 = this.r_meta_item_sub.exec(m.value)
-                  if (m2) record.meta["EVK"][m2.groups.key] = nameGroups(m2, this.r_meta_item_sub_names).value;
+                  let match2 = this.r_meta_item_sub.exec(m.value)
+                  let m2 = match2 ? nameGroups(match2, this.r_meta_item_sub_names) : {};
+                  if (m2) record.meta["EVK"][m2.key] = m2.value;
                 }
                 else record.meta[m.key] = m.value;
               }
