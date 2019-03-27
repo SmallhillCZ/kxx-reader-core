@@ -9,7 +9,7 @@
     "kxx"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha -r ts-node/register src/**/*.spec.ts"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,16 @@
   },
   "homepage": "https://github.com/SmallhillCZ/kxx-reader-core#readme",
   "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^11.12.0",
+    "chai": "^4.2.0",
+    "mocha": "^6.0.2",
+    "ts-node": "^8.0.3",
     "typescript": "^3.3.3333"
+  },
+  "dependencies": {
+    "@types/xregexp": "^3.0.29",
+    "xregexp": "^4.2.4"
   }
 }
