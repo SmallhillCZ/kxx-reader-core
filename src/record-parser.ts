@@ -132,7 +132,8 @@ export class RecordParser implements KxxTransformer<string[], KxxRecord> {
 
         case "#":
           matches = this.r_meta_line.exec(line);
-          const text: string = matches ? matches.groups.text : null;
+          const t: any = matches ? nameGroups(matches, this.r_meta_line_names) : {};
+          const text: string = matches ? t.text : null;
 
           if (text) {
 
