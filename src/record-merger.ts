@@ -12,7 +12,9 @@ export class RecordMerger implements KxxTransformer<string, string[]> {
   }
 
   async transform(line: any) {
-
+    
+    line = String(line);
+    
     const type = line.substr(2, 1);
     const id = type === "@" ? line.substr(5, 9) : line.substr(7, 9);
 
