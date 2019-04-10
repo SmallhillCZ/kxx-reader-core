@@ -1,6 +1,6 @@
 {
   "name": "kxx-reader-core",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Core methods for reading Gordic (Ginis) KXX format",
   "main": "lib/index.js",
   "keywords": [
