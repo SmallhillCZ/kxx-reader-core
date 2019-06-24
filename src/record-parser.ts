@@ -32,7 +32,7 @@ export class RecordParser implements KxxTransformer<string[], KxxRecord> {
   r_period = /^6\/@(\d{8})(\d{2})(\d{2}) (\d) (\d{4})/;
   r_period_names: string[] = ["id", "month", "type", "input", "year"];
 
-  r_record = /^G\/@(\d{2})([ 0-9]{9})000(\d{3})(\d{4})(\d{2})\d\d(\d{4})(\d{4})(\d{3})(\d{9})(\d{10})(\d{13})(\d{16})(\d{2})([\-C ])(\d{16})(\d{2})([\-C ])/;
+  r_record = /^G\/@(\d{2})([ 0-9]{9})000(\d{3})([\d ]{4})(\d{2})\d\d(\d{4})(\d{4})(\d{3})(\d{9})(\d{10})(\d{13})(\d{16})(\d{2})([\-C ])(\d{16})(\d{2})([\-C ])/;
   r_record_names: string[] = ["day", "docid", "su", "au", "kap", "odpa", "pol", "zj", "uz", "orj", "org", "md", "md_decimal", "md_sign", "d", "d_decimal", "d_sign"];
 
   r_comment = /^G\/\$(\d{4})([ 0-9]{9})(.*)$/;
